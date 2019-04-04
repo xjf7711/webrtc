@@ -1,0 +1,31 @@
+.van-nav-bar {
+  background-color: #26a2ff;
+  //color: #ffffff;
+  &__title {
+    color: #ffffff;
+    font-weight: 800;
+  }
+}
+
+.van-tabbar {
+  background: #eee;
+}
+
+.van-tabbar-item {
+  &--active {
+    background: #ddd;
+  }
+}
+
+.van-number-keyboard {
+  //position: relative;
+  width: 29.2%;
+  bottom: 99px;
+  right: 0;
+  left: auto;
+  //border-top: 0.5px solid #eee;
+}
+.van-key {
+  //border-top: 0.5px solid #eee;
+  //border-right: 0.1px solid #ccc;
+}
