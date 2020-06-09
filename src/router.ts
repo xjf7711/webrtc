@@ -5,6 +5,12 @@ import Layout from "./views/layout/Index.vue";
 Vue.use(Router);
 
 export const gumRouteMap = [
+  // {
+  //   path: "openCV",
+  //   name: "openCV",
+  //   meta: { index: 0, title: "openCV" },
+  //   component: () => import("./views/openCV/Index.vue")
+  // },
   {
     path: "sse",
     name: "SSE",

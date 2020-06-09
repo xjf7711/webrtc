@@ -22,47 +22,49 @@ async def hello(request):
             await asyncio.sleep(1, loop=loop)
     return resp
 
-# def from_vedio():
-# # 	thread1 = threading.Thread(target=vedio_thread1, args=(1,))
-# # #     thread1.setDaemon(True)
-# # 	thread1.start()
-# 	thread2 = threading.Thread(target=vedio_thread2, args=(1,))
-# #     thread1.setDaemon(True)
-# 	thread2.start()
-# 	print('start')
 
-#
-# def vedio_thread1(n):
-# 	print('send')
-# 	while True:
-# 		# if len(server.clients) > 0:
-#         image = cv2.imencode('.jpg', frame)[1]
-#         base64_data = base64.b64encode(image)
-#         s = base64_data.decode()
-#         # print('data:image/jpeg;base64,%s'%s)
-#         # server.send_message_to_all('data:image/jpeg;base64,' + s)
-# 		time.sleep(0.01)
+def from_vedio():
+    thread1 = threading.Thread(target=vedio_thread1, args=(1,))
+#     thread1.setDaemon(True)
+    thread1.start()
+    thread2 = threading.Thread(target=vedio_thread2, args=(1,))
+#     thread1.setDaemon(True)
+    thread2.start()
+    print('start')
 
-#
-# def vedio_thread2(n):
-#     global camera1
-#     camera1 = cv2.VideoCapture(rtsp_path)
-#     global frame
-#     while True:
-#         _, img_bgr = camera1.read()
-#         if img_bgr is None:
-#             camera1 = cv2.VideoCapture(rtsp_path)
-#             print('丢失帧')
-#         else:
-#             frame = img_bgr
+
+async def vedio_thread1(request):
+    print('send')
+    async with sse_response(request) as resp:
+        while True:
+            # if len(server.clients) > 0:
+            image = cv2.imencode('.jpg', frame)[1]
+            base64_data = base64.b64encode(image)
+            steam = base64_data.decode()
+            await resp.send(steam)
+            await asyncio.sleep(0.02)
+            # print('data:image/jpeg;base64,%s'%s)
+            # server.send_message_to_all('data:image/jpeg;base64,' + s)
+            # time.sleep(0.01)
+    return resp
+
+
+def vedio_thread2(n):
+    global camera1
+    camera1 = cv2.VideoCapture(rtsp_path)
+    global frame
+    while True:
+        _, img_bgr = camera1.read()
+        if img_bgr is None:
+            camera1 = cv2.VideoCapture(rtsp_path)
+            print('丢失帧')
+        else:
+            frame = img_bgr
 
 
 async def sse(request):
-    # loop = request.app.loop
     async with sse_response(request) as resp:
         while True:
-            # data = 'Server Time : {}'.format(datetime.now())
-            # print(data)
             global camera1
             camera1 = cv2.VideoCapture(rtsp_path)
             global frame
@@ -73,9 +75,9 @@ async def sse(request):
                 print('丢失帧')
             else:
                 frame = img_bgr
-                image = cv2.imencode('.jpg', frame)[1]
-                base64_data = base64.b64encode(image)
-                data = base64_data.decode()
+            image = cv2.imencode('.jpg', frame)[1]
+            base64_data = base64.b64encode(image)
+            data = base64_data.decode()
             await resp.send(data)
             await asyncio.sleep(0.05)
     return resp
@@ -106,6 +108,8 @@ async def sse(request):
 
 
 if __name__ == '__main__':
+    # get_frame()
+    from_vedio()
     app = web.Application()
-    app.add_routes([web.get('/stream', sse), web.get("/hello", hello)])
+    app.add_routes([web.get('/stream', vedio_thread1), web.get("/hello", hello)])
     web.run_app(app, host='0.0.0.0', port=8282)
